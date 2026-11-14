@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokédex – Pokémon: A Jornada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: carcaça vermelha de Pokédex à esquerda (lista + filtros), página de ficha em papel à direita */
+  --shell:#c8232c; --shell-dark:#8f1219; --paper:#fbfaf6; --ink:#1d2330; --muted:#6a7080; --line:#dcd8cc; --screen:#e8f3ee;
+  --display:"Chakra Petch", "Segoe UI", sans-serif; --body:"Nunito Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--shell-dark);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.app{display:grid;grid-template-columns:320px 1fr;height:100%;gap:0}
+/* ---------- carcaça ---------- */
+.side{background:linear-gradient(180deg,var(--shell) 0%, #b51d25 100%);display:flex;flex-direction:column;min-height:0;border-right:6px solid var(--shell-dark)}
+.lights{display:flex;align-items:center;gap:10px;padding:16px 18px 10px}
+.lens{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bfe9ff 0 18%,#2a9bd8 40%,#105c8e 100%);border:4px solid #fff;box-shadow:0 0 0 3px var(--shell-dark)}
+.dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--shell-dark)}
+.brand{margin-left:auto;text-align:right;color:#fff}
+.brand b{font-family:var(--display);font-size:20px;letter-spacing:.04em;display:block;line-height:1}
+.brand span{font-size:11px;opacity:.85;letter-spacing:.08em;text-transform:uppercase}
+.controls{padding:6px 18px 12px;display:grid;gap:8px}
+.controls input,.controls select{width:100%;font:inherit;font-size:14px;padding:9px 12px;border-radius:8px;border:2px solid var(--shell-dark);background:var(--screen);color:var(--ink)}
+.controls input:focus,.controls select:focus{outline:3px solid #ffd54a;outline-offset:1px}
+.gens{display:flex;gap:6px;flex-wrap:wrap}
+.gens button{flex:1;font:600 13px var(--display);padding:6px 0;border-radius:6px;border:2px solid var(--shell-dark);background:#fff3;color:#fff;cursor:pointer}
+.gens button[aria-pressed="true"]{background:#ffd54a;color:var(--ink)}
+.gens button:focus-visible{outline:3px solid #fff}
+.count{color:#ffe3e3;font-size:12px}
+.list{flex:1;min-height:0;overflow:auto;margin:0 14px 16px;background:var(--screen);border-radius:10px;border:4px solid var(--shell-dark);padding:6px}
+.item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 10px;border:0;border-radius:6px;background:none;font:inherit;color:var(--ink);cursor:pointer}
+.item:hover{background:#d3e8de}
+.item[aria-current="true"]{background:var(--ink);color:#fff}
+.item:focus-visible{outline:3px solid var(--shell);outline-offset:-2px}
+.item .num{font:600 12px var(--display);color:var(--muted);width:34px;font-variant-numeric:tabular-nums}
+.item[aria-current="true"] .num{color:#aeb6c8}
+.item .nm{flex:1;font-weight:700}
+.item .tds{display:flex;gap:3px}
+.item .tds i{width:10px;height:10px;border-radius:50%;display:block}
+/* ---------- página ---------- */
+.main{overflow:auto;padding:28px 20px 40px;background:radial-gradient(circle at 100% 0,#a3161e 0,var(--shell-dark) 55%)}
+.page{max-width:900px;margin:0 auto;background:var(--paper);border-radius:14px;box-shadow:0 18px 40px #0005;overflow:hidden}
+.hero{display:grid;grid-template-columns:230px 1fr;gap:26px;padding:28px 30px 22px;position:relative}
+.emblem{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;position:relative;background:var(--c1);box-shadow:inset 0 -14px 0 #0002}
+.emblem::before{content:"";position:absolute;inset:14px;border-radius:50%;border:3px dashed #fff8}
+.emblem .big{font:700 64px var(--display);color:#fff;text-shadow:0 3px 0 #0003;letter-spacing:.02em}
+.emblem .ini{position:absolute;bottom:22px;font:700 13px var(--display);color:#fffd;letter-spacing:.2em;text-transform:uppercase}
+.emblem.dual{background:conic-gradient(var(--c1) 0 50%,var(--c2) 50% 100%)}
+.facts{display:grid;grid-template-columns:auto 1fr;align-content:center;column-gap:16px}
+.facts dt,.facts dd{margin:0;padding:9px 0;border-bottom:1px dotted var(--line)}
+.facts dt{font:600 13px var(--display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:right;border-right:2px solid var(--ink);padding-right:14px}
+.facts dd{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.name{font:700 32px/1.1 var(--display);margin:0;text-wrap:balance}
+.badge{font:600 12px var(--display);text-transform:uppercase;letter-spacing:.05em;color:#fff;padding:4px 10px;border-radius:99px;background:var(--tc)}
+.badge.soft{background:color-mix(in srgb,var(--tc) 16%,#fff);color:color-mix(in srgb,var(--tc) 75%,#000);border:1px solid color-mix(in srgb,var(--tc) 40%,#fff)}
+.evo{font-weight:600}
+.evo a{color:var(--shell);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.origin{position:absolute;top:14px;right:18px;font-size:11px;color:var(--muted);background:#f0ede3;padding:3px 8px;border-radius:4px}
+.moves{padding:0 30px 26px}
+.moves h2{font:700 15px var(--display);text-transform:uppercase;letter-spacing:.08em;margin:6px 0 8px;display:flex;justify-content:space-between}
+.moves h2 small{font:600 12px var(--body);color:var(--muted);text-transform:none;letter-spacing:0}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{text-align:left;font:600 12px var(--display);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+tbody td{padding:9px 10px;border-bottom:1px dotted #c9c5b9;vertical-align:top}
+tbody tr:last-child td{border-bottom:3px solid var(--ink)}
+tbody tr:hover{background:#f3f0e6}
+td.lv{font:700 15px var(--display);text-align:center;width:54px;font-variant-numeric:tabular-nums}
+td.at{font-weight:800;white-space:nowrap}
+td.ty{width:100px}
+td.ty .badge{font-size:10.5px;padding:3px 8px}
+td.ds{color:#2c3242}
+.dice{font:700 13px var(--display);background:var(--ink);color:#fff;padding:1px 6px;border-radius:4px;white-space:nowrap}
+.roll{font-weight:800;color:var(--shell);white-space:nowrap}
+.pager{display:flex;justify-content:space-between;gap:10px;padding:14px 30px;background:#f0ede3;border-top:1px solid var(--line)}
+.pager button{font:600 14px var(--display);padding:9px 14px;border-radius:8px;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pager button:hover{background:var(--ink);color:#fff}
+.pager button:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink)}
+.pager button:focus-visible{outline:3px solid var(--shell);outline-offset:2px}
+.hint{text-align:center;color:#ffd0d0;font-size:12px;margin-top:12px}
+.empty{padding:20px;color:var(--muted);text-align:center}
+.emblem img{position:absolute;inset:10%;width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 6px 6px #0003);z-index:1}
+.emblem.has::before{display:none}
+.emblem.has{background:radial-gradient(circle,#fff 0 58%,var(--c1) 59%)}
+.emblem.has.dual{background:radial-gradient(circle,#fff 0 58%,transparent 59%),conic-gradient(var(--c1) 0 50%,var(--c2) 50% 100%)}
+.emblem.has .big,.emblem.has .ini{display:none}
+.imgbar{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.imgbar button,.imgbar label{font:600 12px var(--display);padding:6px 10px;border-radius:6px;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.imgbar button:hover,.imgbar label:hover{background:var(--ink);color:#fff}
+.imgbar label:focus-within,.imgbar button:focus-visible{outline:3px solid var(--shell);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.bulk{display:flex;flex-direction:column;gap:4px}
+.bulk label{font:600 13px var(--display);text-align:center;padding:8px;border-radius:8px;border:2px dashed #fff9;color:#fff;cursor:pointer;background:#fff1}
+.bulk label:hover{background:#fff3}... (79 KB restante(s))
